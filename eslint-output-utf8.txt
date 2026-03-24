@@ -1,0 +1,15 @@
+﻿
+C:\Users\Lenovo\Desktop\GigNest\app\freelancer\jobs\[id]\page.tsx
+    7:10   warning  'Input' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+    8:32   warning  'Briefcase' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+   13:11   warning  'router' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+   14:36   error    Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   30:23   error    Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   41:8    warning  React Hook useEffect has a missing dependency: 'fetchJob'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   65:23   error    Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   83:23   error    Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  160:92   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                              react/no-unescaped-entities
+  160:109  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                              react/no-unescaped-entities
+
+Γ£û 10 problems (6 errors, 4 warnings)
+

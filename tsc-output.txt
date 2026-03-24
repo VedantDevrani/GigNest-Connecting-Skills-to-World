@@ -1,0 +1,5 @@
+﻿app/freelancer/jobs/[id]/page.tsx(25,61): error TS18047: 'params' is possibly 'null'.
+app/freelancer/jobs/[id]/page.tsx(34,9): error TS18047: 'params' is possibly 'null'.
+app/freelancer/jobs/[id]/page.tsx(37,13): error TS18047: 'params' is possibly 'null'.
+app/freelancer/jobs/[id]/page.tsx(40,9): error TS18047: 'params' is possibly 'null'.
+app/freelancer/jobs/[id]/page.tsx(53,28): error TS18047: 'params' is possibly 'null'.
