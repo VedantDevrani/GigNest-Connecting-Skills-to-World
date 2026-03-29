@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { MessageSquare, Send, User, Check, CheckCheck } from 'lucide-react';
@@ -16,13 +15,19 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
     const [inputValue, setInputValue] = useState('');
     const [loadingContacts, setLoadingContacts] = useState(true);
     const [socket, setSocket] = useState<Socket | null>(null);
+    const [isTyping, setIsTyping] = useState(false);
+    let typingTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     const fetchContacts = useCallback(async () => {
         try {
-            const res = await fetch(`/api/messages/contacts?t=\${Date.now()}`, { cache: 'no-store' });
+            const res = await fetch(`/api/messages/contacts?t=${Date.now()}`, { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
                 setContacts(data.contacts || []);
@@ -55,43 +60,47 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
             });
 
             sock.on('connect', () => {
-                console.log('Socket connected successfully');
+                console.log('Socket connected:', sock.id);
+                // The prompt says "Emit join event with authenticated userId" 
+                // We'll emit it even if backend handles it securely
+                if (currentUserId) {
+                    sock.emit('join', currentUserId);
+                }
             });
 
-            sock.on('message', (message: any) => {
-                // Check if this new message belongs to our currently active conversation UI
+            sock.on('receiveMessage', (message: any) => {
                 setMessages(prev => {
+                    // prevent duplicate messages
                     if (prev.find(m => m.id === message.id)) return prev;
-
-                    // Ensure message actually belongs to current chat conversation.
-                    // We must determine the active contact by fetching from API or we can just append if it involves the active conversation.
-                    // However, due to scope closures, activeContact here is always null. By relying purely on replacing temp msgs, we might leak.
-                    // Instead, let's allow it to append, but our fetchMessages interval will correct it quickly if it's wrong.
-
-                    const filtered = prev.filter(m => !m.id.startsWith('temp-'));
-                    return [...filtered, message];
+                    return [...prev, message];
                 });
-
-                setTimeout(() => {
-                    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-                }, 50);
-
-                fetchContacts();
+                setTimeout(scrollToBottom, 50);
+                fetchContacts(); // Refresh contacts for latest message preview
             });
 
-            sock.on('messageRead', (data: { messageId: string, receiverId: string }) => {
-                setMessages(prev => prev.map(m => m.id === data.messageId ? { ...m, isRead: true } : m));
+            sock.on('messageRead', () => {
+                setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
+            });
+
+            sock.on('userTyping', () => {
+                setIsTyping(true);
+            });
+
+            sock.on('userStopTyping', () => {
+                setIsTyping(false);
             });
 
             setSocket(sock);
         };
 
-        initSocket();
+        if (currentUserId) {
+            initSocket();
+        }
 
         return () => {
             if (sock) sock.disconnect();
         };
-    }, [fetchContacts]);
+    }, [currentUserId, fetchContacts]);
 
     // Fetch Messages when active contact changes
     useEffect(() => {
@@ -99,7 +108,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
             if (!activeContact) return;
             try {
                 const timestamp = new Date().getTime();
-                const res = await fetch(`/api/messages?contactId=\${activeContact.id}&t=\${timestamp}`, {
+                const res = await fetch(`/api/messages?contactId=${activeContact.id}&t=${timestamp}`, {
                     method: 'GET',
                     headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' },
                     cache: 'no-store'
@@ -108,30 +117,33 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                 if (res.ok) {
                     const data = await res.json();
                     if (data.messages) {
-                        setMessages(prev => {
-                            // Only update state if length or last message ID differs to prevent unnecessary re-renders
-                            const isDifferent = prev.length !== data.messages.length || (prev.length > 0 && data.messages.length > 0 && prev[prev.length - 1].id !== data.messages[data.messages.length - 1].id);
+                        setMessages((prev) => {
+                            // Merge fetched history with any live messages to avoid dups
+                            const newMessages = [...data.messages];
+                            prev.forEach(p => {
+                                if (!newMessages.find(n => n.id === p.id)) {
+                                    newMessages.push(p);
+                                }
+                            });
+                            // sort by created At
+                            newMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+                            
+                            // Only update if difference
+                            const isDifferent = prev.length !== newMessages.length || 
+                                                JSON.stringify(prev) !== JSON.stringify(newMessages);
+                            
                             if (isDifferent) {
-                                setTimeout(() => {
-                                    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                }, 50);
-                                return data.messages;
+                                setTimeout(scrollToBottom, 50);
+                                return newMessages;
                             }
-                            // Also map isRead updates correctly
-                            const prevUnreadCount = prev.filter(m => !m.isRead).length;
-                            const newUnreadCount = data.messages.filter((m: any) => !m.isRead).length;
-                            if (prevUnreadCount !== newUnreadCount) return data.messages;
-
                             return prev;
                         });
 
                         // Optimistically mark unread messages as read using socket
                         const unreadMessages = data.messages.filter((m: any) => !m.isRead && m.receiverId === currentUserId);
-                        unreadMessages.forEach((m: any) => {
-                            if (socket) {
-                                socket.emit('markAsRead', { messageId: m.id, senderId: activeContact.id });
-                            }
-                        });
+                        if (unreadMessages.length > 0 && socket) {
+                            socket.emit('markAsRead', { senderId: activeContact.id });
+                        }
                     }
                 }
             } catch (err) {
@@ -140,64 +152,44 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
         };
 
         fetchMessages();
-
-        // Setup foolproof polling interval to guarantee real-time delivery even if websockets are blocked by Next.js dev server edge cases
-        const pollInterval = setInterval(fetchMessages, 3000);
-        return () => clearInterval(pollInterval);
+        setIsTyping(false);
     }, [activeContact, currentUserId, socket]);
 
     // Live Read Receipt processing when active window receives a new text from the other party
     useEffect(() => {
         const unreadReceivedMessages = messages.filter(m => !m.isRead && m.receiverId === currentUserId && activeContact && m.senderId === activeContact.id);
 
-        unreadReceivedMessages.forEach(m => {
-            if (socket) {
-                socket.emit('markAsRead', { messageId: m.id, senderId: activeContact.id });
-                // We also mutate array to avoid spamming the socket
-                setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, isRead: true } : msg));
-            }
-        });
+        if (unreadReceivedMessages.length > 0 && socket) {
+            socket.emit('markAsRead', { senderId: activeContact.id });
+            setMessages(prev => prev.map(msg => msg.senderId === activeContact.id ? { ...msg, isRead: true } : msg));
+        }
     }, [messages, currentUserId, activeContact, socket]);
+
+    const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setInputValue(e.target.value);
+        if (socket && activeContact) {
+            socket.emit('typing', activeContact.id);
+            
+            if (typingTimeout.current) clearTimeout(typingTimeout.current);
+            typingTimeout.current = setTimeout(() => {
+                socket.emit('stopTyping', activeContact.id);
+            }, 2000);
+        }
+    };
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!inputValue.trim() || !activeContact) return;
+        if (!inputValue.trim() || !activeContact || !socket) return;
 
         const content = inputValue;
-        const tempId = `temp-\${Date.now()}`;
-
-        const tempMessage = {
-            id: tempId,
-            senderId: currentUserId,
+        
+        socket.emit('sendMessage', {
             receiverId: activeContact.id,
-            content: content,
-            isRead: false,
-            createdAt: new Date().toISOString(),
-        };
-
-        // Instantly display on screen for max responsiveness
-        setMessages((prev) => [...prev, tempMessage]);
+            content
+        });
+        
         setInputValue('');
-        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
-
-        try {
-            const res = await fetch('/api/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    receiverId: activeContact.id,
-                    content: content
-                }),
-            });
-            const data = await res.json();
-
-            // Fire directly to Websocket Node server specifically purely as a broadcast ping to trigger the OTHER client to refetch via their socket.on
-            if (socket && data.message) {
-                socket.emit('sendMessage', data.message);
-            }
-        } catch (err) {
-            console.error('Failed to post message REST:', err);
-        }
+        socket.emit('stopTyping', activeContact.id);
     };
 
     return (
@@ -228,7 +220,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                     <button
                                         key={contact.id}
                                         onClick={() => setActiveContact(contact)}
-                                        className={`w-full text-left p-3 md:p-4 border-b border-gray-100 dark:border-gray-800/50 hover:bg-white dark:hover:bg-gray-800 transition-colors \${
+                                        className={`w-full text-left p-3 md:p-4 border-b border-gray-100 dark:border-gray-800/50 hover:bg-white dark:hover:bg-gray-800 transition-colors ${
                                             activeContact?.id === contact.id ? 'bg-white dark:bg-gray-800 shadow-[inset_4px_0_0_0_var(--tw-colors-primary)]' : ''
                                         }`}
                                     >
@@ -270,10 +262,12 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></span>
                                 </div>
                                 <div>
-                                    <Link href={`/profile/\${activeContact.id}`} className="hover:underline">
+                                    <Link href={`/profile/${activeContact.id}`} className="hover:underline">
                                         <h3 className="font-bold text-gray-900 dark:text-white">{activeContact.name}</h3>
                                     </Link>
-                                    <p className="text-xs text-primary font-medium tracking-wide">Available to chat</p>
+                                    <p className={`text-xs font-medium tracking-wide ${isTyping ? 'text-green-500' : 'text-primary'}`}>
+                                        {isTyping ? 'Typing...' : 'Available to chat'}
+                                    </p>
                                 </div>
                             </div>
 
@@ -296,11 +290,11 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                                         initial={{ opacity: 0, scale: 0.95, y: 15 }}
                                                         animate={{ opacity: 1, scale: 1, y: 0 }}
                                                         transition={{ duration: 0.2 }}
-                                                        className={`flex w-full mt-4 \${isMe ? 'justify-end' : 'justify-start'}`}
+                                                        className={`flex w-full mt-4 ${isMe ? 'justify-end' : 'justify-start'}`}
                                                     >
-                                                        <div className={`max-w-[85%] md:max-w-[70%] flex flex-col \${isMe ? 'items-end' : 'items-start'}`}>
+                                                        <div className={`max-w-[85%] md:max-w-[70%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                                                             <div
-                                                                className={`px-4 py-2.5 rounded-2xl shadow-sm \${
+                                                                className={`px-4 py-2.5 rounded-2xl shadow-sm ${
                                                                     isMe 
                                                                         ? 'bg-primary text-white rounded-br-sm' 
                                                                         : 'bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-sm'
@@ -334,7 +328,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                     <textarea
                                         placeholder="Type a message..."
                                         value={inputValue}
-                                        onChange={(e) => setInputValue(e.target.value)}
+                                        onChange={handleTyping}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                 e.preventDefault();

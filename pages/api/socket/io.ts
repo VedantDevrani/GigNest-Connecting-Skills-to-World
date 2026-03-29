@@ -40,7 +40,7 @@ const ioHandler = (req: NextApiRequest, res: any) => {
                     return next(new Error('Authentication error'));
                 }
 
-                socket.data.user = payload;
+                (socket as any).userId = payload.id;
                 next();
             } catch (e) {
                 next(new Error('Authentication error'));
@@ -48,56 +48,65 @@ const ioHandler = (req: NextApiRequest, res: any) => {
         });
 
         io.on('connection', (socket) => {
-            const user = socket.data.user;
-            socket.join(user.id);
+            const userId = (socket as any).userId;
+            console.log("Socket connected:", socket.id);
+            
+            socket.join(userId);
+            console.log("User joined room:", userId);
 
-            socket.on('sendMessage', async (message) => {
-                const { receiverId } = message;
-                if (!receiverId) return;
+            socket.on('sendMessage', async ({ receiverId, content }) => {
+                const senderId = (socket as any).userId;
+                if (!receiverId || !content) return;
 
                 try {
-                    // Because NextJS natively handles the Postgres insert via POST /api/messages, we purely use websockets for the live delivery ping
-                    socket.to(receiverId).emit('message', message);
-                    socket.emit('message', message);
+                    const message = await prisma.message.create({
+                        data: {
+                            senderId,
+                            receiverId,
+                            content
+                        }
+                    });
+
+                    // Emit to receiver instantly
+                    io.to(receiverId).emit("receiveMessage", message);
+
+                    // Emit back to sender
+                    socket.emit("receiveMessage", message);
                 } catch (error) {
                     console.error('Send message error:', error);
                 }
             });
 
-            socket.on('markAsRead', async (data) => {
-                const { messageId, senderId } = data;
-                if (!messageId || !senderId) return;
+            socket.on('markAsRead', async ({ senderId }) => {
+                if (!senderId) return;
 
                 try {
-                    // @ts-ignore
-                    const message = await prisma.message.update({
-                        where: { id: messageId },
+                    await prisma.message.updateMany({
+                        where: { senderId, receiverId: userId, isRead: false },
                         data: { isRead: true }
                     });
 
-                    // notify sender that it's read
-                    socket.to(senderId).emit('messageRead', { messageId, receiverId: user.id });
+                    // Notify sender
+                    io.to(senderId).emit('messageRead');
                 } catch (error) {
                     console.error('Mark as read error:', error);
                 }
             });
 
-            socket.on('typing', (data) => {
-                const { receiverId } = data;
+            socket.on('typing', (receiverId) => {
                 if (receiverId) {
-                    socket.to(receiverId).emit('typing', { senderId: user.id });
+                    socket.to(receiverId).emit('userTyping');
                 }
             });
 
-            socket.on('stopTyping', (data) => {
-                const { receiverId } = data;
+            socket.on('stopTyping', (receiverId) => {
                 if (receiverId) {
-                    socket.to(receiverId).emit('stopTyping', { senderId: user.id });
+                    socket.to(receiverId).emit('userStopTyping');
                 }
             });
 
             socket.on('disconnect', () => {
-                // Future cleanup
+                console.log("Socket disconnected:", socket.id);
             });
         });
 
