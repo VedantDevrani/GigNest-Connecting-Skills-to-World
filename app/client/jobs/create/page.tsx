@@ -79,7 +79,6 @@ export default function CreateJobPage() {
             router.refresh();
         } catch (err: any) {
             setError(err.message);
-        } finally {
             setLoading(false);
         }
     };

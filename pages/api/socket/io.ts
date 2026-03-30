@@ -14,7 +14,6 @@ export const config = {
 const ioHandler = (req: NextApiRequest, res: any) => {
     if (!res.socket.server.io) {
         const path = '/api/socket/io';
-        console.log(`[Socket.io] Starting Server on ${path}`);
 
         const httpServer: NetServer = res.socket.server as any;
         const io = new ServerIO(httpServer, {
@@ -49,10 +48,8 @@ const ioHandler = (req: NextApiRequest, res: any) => {
 
         io.on('connection', (socket) => {
             const userId = (socket as any).userId;
-            console.log("Socket connected:", socket.id);
             
             socket.join(userId);
-            console.log("User joined room:", userId);
 
             socket.on('sendMessage', async ({ receiverId, content }) => {
                 const senderId = (socket as any).userId;
@@ -106,7 +103,7 @@ const ioHandler = (req: NextApiRequest, res: any) => {
             });
 
             socket.on('disconnect', () => {
-                console.log("Socket disconnected:", socket.id);
+                // Connection closed silently
             });
         });
 

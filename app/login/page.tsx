@@ -43,7 +43,6 @@ export default function LoginPage() {
             }
         } catch (err: any) {
             setError(err.message);
-        } finally {
             setLoading(false);
         }
     };

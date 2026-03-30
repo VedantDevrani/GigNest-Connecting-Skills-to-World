@@ -48,10 +48,12 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
     // Socket Initialization
     useEffect(() => {
         let sock: Socket;
+        let isMounted = true;
 
         const initSocket = async () => {
             // Wake up Next.js WebSocket API Route
             await fetch('/api/socket/io');
+            if (!isMounted) return; // Prevent orphaned connections
 
             sock = io({
                 path: '/api/socket/io',
@@ -60,9 +62,6 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
             });
 
             sock.on('connect', () => {
-                console.log('Socket connected:', sock.id);
-                // The prompt says "Emit join event with authenticated userId" 
-                // We'll emit it even if backend handles it securely
                 if (currentUserId) {
                     sock.emit('join', currentUserId);
                 }
@@ -70,12 +69,11 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
 
             sock.on('receiveMessage', (message: any) => {
                 setMessages(prev => {
-                    // prevent duplicate messages
                     if (prev.find(m => m.id === message.id)) return prev;
                     return [...prev, message];
                 });
                 setTimeout(scrollToBottom, 50);
-                fetchContacts(); // Refresh contacts for latest message preview
+                fetchContacts();
             });
 
             sock.on('messageRead', () => {
@@ -90,7 +88,8 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                 setIsTyping(false);
             });
 
-            setSocket(sock);
+            if (isMounted) setSocket(sock);
+            else sock.disconnect(); // Disconnect immediately if unmounted during setup
         };
 
         if (currentUserId) {
@@ -98,6 +97,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
         }
 
         return () => {
+            isMounted = false;
             if (sock) sock.disconnect();
         };
     }, [currentUserId, fetchContacts]);

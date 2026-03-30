@@ -49,7 +49,6 @@ export default function RegisterPage() {
             }
         } catch (err: any) {
             setError(err.message);
-        } finally {
             setLoading(false);
         }
     };

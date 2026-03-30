@@ -25,10 +25,14 @@ export async function GET() {
             select: { sender: { select: { id: true, name: true, role: true } }, createdAt: true, content: true }
         });
 
+        const validContactIds = new Set<string>();
         const contactsMap = new Map();
 
         const addContact = (user: any, msg: any = null) => {
             if (!user) return;
+            // ONLY ALLOW CONTACTS WITH A VALID RELATION
+            if (!validContactIds.has(user.id)) return;
+            
             const existing = contactsMap.get(user.id);
             const msgDate = msg ? new Date(msg.createdAt) : new Date(0);
             if (!existing || existing.updatedAt < msgDate) {
@@ -40,19 +44,40 @@ export async function GET() {
             }
         };
 
-        // Add users from contracts so empty conversations can be started
+        // Determine valid relations from Contracts and Proposals
         if (userToken.role === 'CLIENT') {
             const contracts = await prisma.contract.findMany({
                 where: { clientId: userToken.id },
                 include: { freelancer: { select: { id: true, name: true, role: true } } }
             });
+            contracts.forEach(c => validContactIds.add(c.freelancer.id));
+
+            const proposals = await prisma.proposal.findMany({
+                where: { job: { clientId: userToken.id } },
+                include: { freelancer: { select: { id: true, name: true, role: true } } }
+            });
+            proposals.forEach(p => validContactIds.add(p.freelancer.id));
+
+            // Initialize contacts
             contracts.forEach(c => addContact(c.freelancer, { createdAt: c.createdAt, content: 'Contract started' }));
+            proposals.forEach(p => addContact(p.freelancer, { createdAt: p.createdAt, content: 'Proposal submitted' }));
+            
         } else {
             const contracts = await prisma.contract.findMany({
                 where: { freelancerId: userToken.id },
                 include: { client: { select: { id: true, name: true, role: true } } }
             });
+            contracts.forEach(c => validContactIds.add(c.client.id));
+
+            const proposals = await prisma.proposal.findMany({
+                where: { freelancerId: userToken.id },
+                include: { job: { include: { client: { select: { id: true, name: true, role: true } } } } }
+            });
+            proposals.forEach(p => validContactIds.add(p.job.client.id));
+
+            // Initialize contacts
             contracts.forEach(c => addContact(c.client, { createdAt: c.createdAt, content: 'Contract started' }));
+            proposals.forEach(p => addContact(p.job.client, { createdAt: p.createdAt, content: 'Proposal submitted' }));
         }
 
         sentMessages.forEach(m => addContact(m.receiver, m));

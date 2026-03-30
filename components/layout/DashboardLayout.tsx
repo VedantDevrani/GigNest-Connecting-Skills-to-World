@@ -16,6 +16,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [userProfile, setUserProfile] = useState<{ name: string } | null>(null);
     const notificationRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
     const router = useRouter();
@@ -35,6 +36,22 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
         { name: 'Earnings', href: '/freelancer/earnings', icon: CreditCard },
         { name: 'Profile Settings', href: '/freelancer/settings', icon: Settings },
     ];
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const endpoint = userRole === 'CLIENT' ? '/api/client/profile' : '/api/freelancer/profile';
+                const res = await fetch(endpoint);
+                if (res.ok) {
+                    const data = await res.json();
+                    setUserProfile(data.user);
+                }
+            } catch (err) {
+                console.error('Failed to load profile', err);
+            }
+        };
+        fetchProfile();
+    }, [userRole]);
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -247,6 +264,18 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                                 )}
                             </AnimatePresence>
                         </div>
+                        
+                        {/* User Profile Info */}
+                        <div className="flex items-center gap-3 pl-4 border-l border-gray-100 dark:border-gray-800 ml-2">
+                            <div className="hidden sm:block text-right">
+                                <p className="text-sm font-bold text-gray-900 dark:text-white capitalize leading-tight">{userProfile?.name || 'User'}</p>
+                                <p className="text-xs text-gray-400 capitalize">{userRole.toLowerCase()}</p>
+                            </div>
+                            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shadow-sm border border-primary/20 shrink-0">
+                                {userProfile?.name?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                        </div>
+
                     </div>
                 </header>
 
