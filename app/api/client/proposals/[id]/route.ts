@@ -74,7 +74,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                     data: {
                         userId: proposal.freelancerId,
                         type: 'PROPOSAL_ACCEPTED',
-                        message: `Congratulations! Your proposal for "\${proposal.job.title}" was accepted and a contract has been created.`
+                        message: `Congratulations! Your proposal for "${proposal.job.title}" was accepted and a contract has been created.`
+                    }
+                });
+
+                // Notify client
+                await tx.notification.create({
+                    data: {
+                        userId: userToken.id,
+                        type: 'CONTRACT_STARTED',
+                        message: `Contract started with freelancer for "${proposal.job.title}". You can now message them.`
                     }
                 });
 

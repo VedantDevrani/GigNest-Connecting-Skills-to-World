@@ -19,6 +19,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "GigNest | Freelance Marketplace",
   description: "A modern freelance marketplace connecting clients and top talent.",
+  other: {
+    darkreader: "noop",
+  },
 };
 
 export default function RootLayout({

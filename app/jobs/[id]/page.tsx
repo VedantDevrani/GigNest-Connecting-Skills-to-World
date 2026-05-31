@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { MapPin, Clock, DollarSign, Building2, Calendar, Share2, Flag, ArrowLeft } from 'lucide-react';
 
-export default async function JobDetailsPage({ params }: { params: { id: string } }) {
+export default async function JobDetailsPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     const { id } = params;
 
     const job = await prisma.job.findUnique({
