@@ -60,12 +60,33 @@ const ioHandler = (req: NextApiRequest, res: any) => {
             }
         });
 
+        // Store online users on the server instance to survive dev reloads
+        const httpServer = res.socket.server as any;
+        if (!httpServer.onlineUsers) httpServer.onlineUsers = new Map<string, number>();
+        const onlineUsers = httpServer.onlineUsers as Map<string, number>;
+
         // ── Connection Handler ────────────────────────────────────────────────
         io.on('connection', (socket) => {
             const userId = (socket as any).userId as string;
 
+            // Track online status
+            const userConnCount = onlineUsers.get(userId) || 0;
+            onlineUsers.set(userId, userConnCount + 1);
+            if (userConnCount === 0) {
+                socket.broadcast.emit('userOnline', { userId });
+            }
+
             // Each user joins a personal room for receiving directed messages
             socket.join(`user:${userId}`);
+
+            // Client requests status of another user
+            socket.on('checkStatus', ({ userId: targetUserId }: { userId: string }) => {
+                if (onlineUsers.has(targetUserId)) {
+                    socket.emit('userOnline', { userId: targetUserId });
+                } else {
+                    socket.emit('userOffline', { userId: targetUserId });
+                }
+            });
 
             // ── Join a Conversation Room ────────────────────────────────────
             socket.on('joinConversation', async (conversationId: string) => {
@@ -96,7 +117,7 @@ const ioHandler = (req: NextApiRequest, res: any) => {
                             content: content.trim(),
                         },
                         include: {
-                            sender: { select: { id: true, name: true } },
+                            sender: { select: { id: true, name: true, avatarUrl: true } },
                         },
                     });
 
@@ -166,21 +187,16 @@ const ioHandler = (req: NextApiRequest, res: any) => {
                 }
             });
 
-            // ── Typing Indicators ───────────────────────────────────────────
-            socket.on('typing', ({ conversationId }: { conversationId: string }) => {
-                if (conversationId) {
-                    socket.to(`conv:${conversationId}`).emit('userTyping', { userId });
-                }
-            });
-
-            socket.on('stopTyping', ({ conversationId }: { conversationId: string }) => {
-                if (conversationId) {
-                    socket.to(`conv:${conversationId}`).emit('userStopTyping', { userId });
-                }
-            });
+            // ── Typing Indicators (Removed) ─────────────────────────────────
 
             socket.on('disconnect', () => {
-                // Clean disconnect — rooms auto-leave on disconnect in Socket.IO
+                const currentCount = onlineUsers.get(userId) || 0;
+                if (currentCount <= 1) {
+                    onlineUsers.delete(userId);
+                    socket.broadcast.emit('userOffline', { userId });
+                } else {
+                    onlineUsers.set(userId, currentCount - 1);
+                }
             });
         });
 

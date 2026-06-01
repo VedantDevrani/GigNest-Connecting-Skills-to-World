@@ -64,10 +64,9 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
     const [loadingConversations, setLoadingConversations] = useState(true);
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [isTyping, setIsTyping] = useState(false);
+    const [isOnline, setIsOnline] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const activeConversationRef = useRef<Conversation | null>(null);
 
     useEffect(() => {
@@ -170,10 +169,17 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                     setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
                 }
             });
-
-            sock.on('userTyping', () => setIsTyping(true));
-            sock.on('userStopTyping', () => setIsTyping(false));
-
+            sock.on('userOnline', ({ userId }: { userId: string }) => {
+                if (activeConversationRef.current?.otherParty?.id === userId) {
+                    setIsOnline(true);
+                }
+            });
+            
+            sock.on('userOffline', ({ userId }: { userId: string }) => {
+                if (activeConversationRef.current?.otherParty?.id === userId) {
+                    setIsOnline(false);
+                }
+            });
             sock.on('error', ({ message: errMsg }: { message: string }) => {
                 console.error('[Socket] Server error:', errMsg);
             });
@@ -196,7 +202,10 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
         if (!socket || !activeConversation) return;
 
         socket.emit('joinConversation', activeConversation.id);
-        setIsTyping(false);
+        
+        // Check online status of the other party
+        socket.emit('checkStatus', { userId: activeConversation.otherParty.id });
+        setIsOnline(false); // Reset until we get a response
 
         // Reset unread count for active conversation
         setConversations(prev =>
@@ -276,20 +285,6 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
         return () => clearInterval(pollInterval);
     }, [activeConversation, scrollToBottom]);
 
-    // ── Typing Handler ────────────────────────────────────────────────────────
-
-    const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setInputValue(e.target.value);
-
-        if (socket && activeConversation) {
-            socket.emit('typing', { conversationId: activeConversation.id });
-            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-            typingTimeoutRef.current = setTimeout(() => {
-                socket.emit('stopTyping', { conversationId: activeConversation.id });
-            }, 2000);
-        }
-    };
-
     // ── Send Message ──────────────────────────────────────────────────────────
 
     const handleSendMessage = async (e: React.FormEvent) => {
@@ -298,12 +293,6 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
 
         const content = inputValue.trim();
         setInputValue('');
-
-        // Clear typing indicator
-        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-        if (socket?.connected) {
-            socket.emit('stopTyping', { conversationId: activeConversation.id });
-        }
 
         // Force HTTP POST for reliability in Turbopack dev environment
         try {
@@ -505,10 +494,10 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                             {activeConversation.otherParty?.name ?? 'Unknown User'}
                                         </h3>
                                     </Link>
-                                    <p className={`text-xs font-medium tracking-wide ${isTyping ? 'text-green-500' : 'text-gray-400'}`}>
-                                        {isTyping
-                                            ? 'Typing...'
-                                            : activeConversation.jobTitle}
+                                    <p className={`text-xs font-medium tracking-wide ${isOnline ? 'text-green-500' : 'text-gray-400'}`}>
+                                        {isOnline
+                                            ? 'Online'
+                                            : `${activeConversation.jobTitle} • ${activeConversation.contractStatus}`}
                                     </p>
                                 </div>
                                 <div className="hidden sm:flex items-center gap-2 text-xs bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-3 py-1 rounded-full font-medium border border-green-200 dark:border-green-800">
@@ -604,7 +593,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                         id="chat-message-input"
                                         placeholder="Type a message..."
                                         value={inputValue}
-                                        onChange={handleTyping}
+                                        onChange={(e) => setInputValue(e.target.value)}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                 e.preventDefault();
