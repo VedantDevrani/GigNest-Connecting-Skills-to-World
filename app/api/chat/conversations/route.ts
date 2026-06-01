@@ -70,7 +70,7 @@ export async function GET() {
 
         // Build a clean response — expose "other party" name + last message + unread count
         const resultRaw = await Promise.all(
-            conversations.map(async (conv) => {
+            conversations.map(async (conv: any) => {
                 const isClient = conv.clientId === userToken.id;
                 const otherParty = isClient ? conv.freelancer : conv.client;
 
@@ -108,10 +108,10 @@ export async function GET() {
         );
 
         // Filter out nulls (conversations with missing users)
-        const result = resultRaw.filter((r) => r !== null);
+        const result = resultRaw.filter((r: any) => r !== null);
 
         // Sort by most recent activity
-        result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+        result.sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
         const response = NextResponse.json({ conversations: result, currentUserId: userToken.id });
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');

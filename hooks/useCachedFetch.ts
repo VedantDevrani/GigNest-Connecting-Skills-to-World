@@ -52,7 +52,7 @@ export function useCachedFetch<T>(
 
     useEffect(() => {
         refetch(!isFresh);
-    }, [key, url]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [key, url]);
 
     return {
         data,

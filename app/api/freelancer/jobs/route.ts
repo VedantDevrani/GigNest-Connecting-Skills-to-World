@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
         const freelancerSkills = freelancer?.skills?.map(s => s.toLowerCase()) || [];
 
         // Base where clause
-        let whereClause: any = {
+        const whereClause: any = {
             status: 'OPEN'
         };
 
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Calculate Match Percentage and attach it
-        let fullyProcessedJobs = jobs.map(job => {
+        const fullyProcessedJobs = jobs.map(job => {
             const jobSkills = job.skills.map(s => s.toLowerCase());
             let matchPercentage = 100;
 

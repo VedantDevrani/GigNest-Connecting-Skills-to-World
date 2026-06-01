@@ -30,7 +30,7 @@ export default function ContactPage() {
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const validate = () => {
-        let newErrors: Record<string, string> = {};
+        const newErrors: Record<string, string> = {};
         if (!formData.name) newErrors.name = 'Name is required';
         if (!formData.email) {
             newErrors.email = 'Email is required';

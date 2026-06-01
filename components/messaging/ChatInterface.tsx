@@ -190,7 +190,6 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
             isMounted = false;
             if (sock) sock.disconnect();
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUserId, scrollToBottom]);
 
     // ── Join Conversation Room When Active Changes ────────────────────────────
