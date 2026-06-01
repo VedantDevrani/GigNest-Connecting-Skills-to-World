@@ -20,6 +20,7 @@ import io, { Socket } from 'socket.io-client';
 interface OtherParty {
     id: string;
     name: string;
+    avatarUrl?: string | null;
 }
 
 interface LastMessage {
@@ -42,6 +43,7 @@ interface Conversation {
 interface MessageSender {
     id: string;
     name: string;
+    avatarUrl?: string | null;
 }
 
 interface Message {

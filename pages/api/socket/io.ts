@@ -61,9 +61,9 @@ const ioHandler = (req: NextApiRequest, res: any) => {
         });
 
         // Store online users on the server instance to survive dev reloads
-        const httpServer = res.socket.server as any;
-        if (!httpServer.onlineUsers) httpServer.onlineUsers = new Map<string, number>();
-        const onlineUsers = httpServer.onlineUsers as Map<string, number>;
+        const nextServer = res.socket.server as any;
+        if (!nextServer.onlineUsers) nextServer.onlineUsers = new Map<string, number>();
+        const onlineUsers = nextServer.onlineUsers as Map<string, number>;
 
         // ── Connection Handler ────────────────────────────────────────────────
         io.on('connection', (socket) => {
