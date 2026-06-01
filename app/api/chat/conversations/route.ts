@@ -44,7 +44,7 @@ export async function GET() {
         });
 
         // For each ONGOING contract, upsert a Conversation (create if not exists)
-        const conversationPromises = ongoingContracts.map(contract =>
+        const conversationPromises = ongoingContracts.map((contract: any) =>
             prisma.conversation.upsert({
                 where: { contractId: contract.id },
                 create: {
