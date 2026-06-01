@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
         let pendingEarnings = 0;
         let completedJobs = 0;
 
-        contracts.forEach(c => {
+        contracts.forEach((c: any) => {
             if (c.paymentStatus === 'PAID') {
                 totalEarnings += c.job.budget;
                 completedJobs++;
