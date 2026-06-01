@@ -122,7 +122,7 @@ export default function RegisterPage() {
                             required
                         />
 
-                        <Button type="submit" fullWidth disabled={loading} className="mt-2" variant={formData.role === 'CLIENT' ? 'primary' : 'secondary'}>
+                        <Button type="submit" fullWidth loading={loading} className="mt-2" variant={formData.role === 'CLIENT' ? 'primary' : 'secondary'}>
                             {loading ? 'Opening account...' : 'Sign Up'}
                         </Button>
 

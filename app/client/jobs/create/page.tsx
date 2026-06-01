@@ -321,10 +321,10 @@ export default function CreateJobPage() {
                 ) : (
                     <Button
                         onClick={handleSubmit}
+                        loading={loading}
                         className="px-8 flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/25"
-                        disabled={loading}
                     >
-                        {loading ? 'Posting...' : 'Post Job Now'} <Check className="w-5 h-5 ml-1" />
+                        {loading ? 'Posting...' : 'Post Job Now'} {!loading && <Check className="w-5 h-5 ml-1" />}
                     </Button>
                 )}
             </div>

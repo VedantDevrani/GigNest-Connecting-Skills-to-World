@@ -11,6 +11,7 @@ import {
     Briefcase,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import io, { Socket } from 'socket.io-client';
@@ -390,16 +391,8 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
 
                     <div className="flex-1 overflow-y-auto">
                         {loadingConversations ? (
-                            <div className="p-4 space-y-3">
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="animate-pulse flex gap-3 items-center p-2">
-                                        <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0" />
-                                        <div className="flex-1 space-y-2 hidden md:block">
-                                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-                                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="flex items-center justify-center py-12">
+                                <Loader size="md" variant="spinner" />
                             </div>
                         ) : conversations.length === 0 ? (
                             <div className="flex flex-col items-center justify-center p-8 text-center opacity-50 h-full">
@@ -524,7 +517,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                 <div className="mt-auto space-y-1 max-w-3xl w-full mx-auto flex flex-col w-full">
                                     {loadingMessages ? (
                                         <div className="flex justify-center py-10">
-                                            <div className="animate-pulse text-sm text-gray-400">Loading messages...</div>
+                                            <Loader size="md" variant="spinner" />
                                         </div>
                                     ) : messages.length === 0 ? (
                                         <div className="text-center opacity-50 py-10">

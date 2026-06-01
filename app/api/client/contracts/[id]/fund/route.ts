@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
                 data: {
                     userId: contract.freelancerId,
                     type: 'CONTRACT_COMPLETED',
-                    message: `Client has deposited funds. Your contract for "\${contract.job.title}" is PAID and COMPLETED.`
+                    message: `Client has deposited funds. Your contract for "${contract.job.title}" is PAID and COMPLETED.`
                 }
             });
 

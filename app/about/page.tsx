@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Target, Heart, Zap, Shield, Github, Twitter, Linkedin } from 'lucide-react';
+import { Target, Heart, Zap, Shield, Github, Mail } from 'lucide-react';
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -60,33 +60,31 @@ export default function AboutPage() {
                     <p className="text-gray-500 dark:text-gray-400">The team working hard to build the future of work.</p>
                 </div>
 
-                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="flex justify-center mt-8">
                     {[
-                        { name: "Alex Jenkins", role: "CEO & Founder", img: "11" },
-                        { name: "Samantha Lee", role: "Head of Product", img: "4" },
-                        { name: "Marcus Torres", role: "Engineering Lead", img: "13" },
-                        { name: "Elena Rostova", role: "Design Director", img: "9" },
-                        { name: "David Chen", role: "Growth Marketing", img: "15" },
-                        { name: "Amira Hassan", role: "People Operations", img: "5" },
-                        { name: "James Wilson", role: "Customer Success", img: "8" },
-                        { name: "Oleg Ivanov", role: "Security & Compliance", img: "12" },
+                        { name: "Vedant Devrani", role: "Developer", img: "/MyImage.png" },
                     ].map((member, i) => (
-                        <motion.div key={i} variants={fadeInUp} className="group cursor-pointer">
-                            <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-4 bg-gray-100 dark:bg-gray-800">
+                        <motion.div key={i} variants={fadeInUp} className="group cursor-pointer max-w-md mx-auto w-full">
+                            <div className="relative w-full aspect-square mb-4 bg-gray-100 dark:bg-gray-800 holographic-card">
                                 <Image
-                                    src={`https://i.pravatar.cc/300?u=${member.img}`}
+                                    src={member.img}
                                     alt={member.name}
                                     fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                                    className="object-cover"
                                 />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white">
-                                    <Twitter className="w-5 h-5 hover:text-primary transition-colors hover:scale-110" />
-                                    <Linkedin className="w-5 h-5 hover:text-primary transition-colors hover:scale-110" />
-                                    <Github className="w-5 h-5 hover:text-primary transition-colors hover:scale-110" />
+                            </div>
+                            <div className="text-center mt-6">
+                                <h3 className="font-bold text-3xl font-poppins group-hover:text-primary transition-colors mb-1">{member.name}</h3>
+                                <p className="text-md text-gray-500 dark:text-gray-400 mb-4">{member.role}</p>
+                                <div className="flex flex-col items-center gap-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                                    <a href="mailto:vedantdevrani177@gmail.com" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                        <Mail className="w-4 h-4" /> vedantdevrani177@gmail.com
+                                    </a>
+                                    <a href="https://github.com/VedantDevrani" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                        <Github className="w-4 h-4" /> github.com/VedantDevrani
+                                    </a>
                                 </div>
                             </div>
-                            <h3 className="font-bold text-lg font-poppins group-hover:text-primary transition-colors">{member.name}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
                         </motion.div>
                     ))}
                 </motion.div>

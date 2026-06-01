@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
             data: {
                 userId: job.clientId,
                 type: 'PROPOSAL_RECEIVED',
-                message: `You received a new proposal for your job: \${job.title}`
+                message: `You received a new proposal for your job: ${job.title}`
             }
         });
 

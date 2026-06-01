@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -9,6 +9,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get('redirect');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -32,14 +34,12 @@ export default function LoginPage() {
                 throw new Error(data.error || 'Failed to login');
             }
 
-            // In a real app, you might want to store token in httpOnly cookie or context 
-            // We rely on route middleware for protection but will save token locally for API calls
-            document.cookie = `token=${data.token}; path=/; max-age=604800`;
-
-            if (data.user.role === 'CLIENT') {
-                router.push('/client/dashboard');
+            if (redirectTo) {
+                router.replace(redirectTo);
+            } else if (data.user.role === 'CLIENT') {
+                router.replace('/client/dashboard');
             } else {
-                router.push('/freelancer/dashboard');
+                router.replace('/freelancer/dashboard');
             }
         } catch (err: any) {
             setError(err.message);
@@ -82,8 +82,8 @@ export default function LoginPage() {
                             required
                         />
 
-                        <Button type="submit" fullWidth disabled={loading} className="mt-2">
-                            {loading ? 'Logging in...' : 'Log In'}
+                        <Button type="submit" fullWidth loading={loading} className="mt-2">
+                            Log In
                         </Button>
 
                         <p className="text-center text-sm text-muted mt-4">

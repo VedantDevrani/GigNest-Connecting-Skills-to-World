@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, MessageSquare, Briefcase, Settings, CreditCard, LogOut, Menu, X, Bell, FileText, FileCheck, User, CheckCircle, Search } from 'lucide-react';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { Logo } from './Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DashboardLayoutProps {
@@ -16,7 +17,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [showNotifications, setShowNotifications] = useState(false);
-    const [userProfile, setUserProfile] = useState<{ name: string } | null>(null);
+    const [userProfile, setUserProfile] = useState<{ name: string; avatarUrl?: string | null } | null>(null);
     const notificationRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
     const router = useRouter();
@@ -66,7 +67,9 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
             }
         };
         fetchNotifications();
-    }, [pathname]);
+        const interval = setInterval(fetchNotifications, 60_000);
+        return () => clearInterval(interval);
+    }, [userRole]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -125,9 +128,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                 <div className="h-full flex flex-col pointer-events-auto">
                     {/* Logo Area */}
                     <div className="h-16 flex items-center px-8 border-b border-gray-100 dark:border-gray-800 shrink-0 justify-between lg:justify-start">
-                        <Link href="/" className="font-poppins font-bold text-2xl text-primary tracking-tight block">
-                            GigNest<span className="text-accent">.</span>
-                        </Link>
+                        <Logo variant="sidebar" />
                         <button className="lg:hidden text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" onClick={() => setSidebarOpen(false)}>
                             <X className="w-5 h-5" />
                         </button>
@@ -152,7 +153,8 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                                 <Link
                                     key={link.name}
                                     href={link.href}
-                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all group ${isActive
+                                    prefetch
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors group ${isActive
                                         ? 'bg-primary/10 text-primary dark:bg-primary/20'
                                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200'
                                         }`}
@@ -271,9 +273,17 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                                 <p className="text-sm font-bold text-gray-900 dark:text-white capitalize leading-tight">{userProfile?.name || 'User'}</p>
                                 <p className="text-xs text-gray-400 capitalize">{userRole.toLowerCase()}</p>
                             </div>
-                            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shadow-sm border border-primary/20 shrink-0">
-                                {userProfile?.name?.charAt(0).toUpperCase() || 'U'}
-                            </div>
+                            {userProfile?.avatarUrl ? (
+                                <img
+                                    src={userProfile.avatarUrl}
+                                    alt={userProfile.name}
+                                    className="w-10 h-10 rounded-full object-cover shadow-sm border border-primary/20 shrink-0 bg-primary/5"
+                                />
+                            ) : (
+                                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shadow-sm border border-primary/20 shrink-0">
+                                    {userProfile?.name?.charAt(0).toUpperCase() || 'U'}
+                                </div>
+                            )}
                         </div>
 
                     </div>

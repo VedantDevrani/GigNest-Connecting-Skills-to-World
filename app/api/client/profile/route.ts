@@ -19,7 +19,7 @@ export async function GET() {
 
         const user = await prisma.user.findUnique({
             where: { id: userToken.id },
-            select: { id: true, name: true, email: true, bio: true, createdAt: true }
+            select: { id: true, name: true, email: true, bio: true, avatarUrl: true, createdAt: true }
         });
 
         return NextResponse.json({ user });
@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest) {
                 ...(body.name && { name: body.name }),
                 ...(body.bio !== undefined && { bio: body.bio })
             },
-            select: { id: true, name: true, email: true, bio: true }
+            select: { id: true, name: true, email: true, bio: true, avatarUrl: true }
         });
 
         return NextResponse.json({ user: updatedUser }, { status: 200 });

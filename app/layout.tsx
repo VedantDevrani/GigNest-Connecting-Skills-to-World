@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/components/ui/Toast";
+import { NavigationProgress } from "@/components/ui/NavigationProgress";
 import { GlobalLayoutWrapper } from "@/components/layout/GlobalLayoutWrapper";
 import "./globals.css";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${poppins.variable} antialiased font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ToastProvider>
+            <NavigationProgress />
             <GlobalLayoutWrapper>
               {children}
             </GlobalLayoutWrapper>

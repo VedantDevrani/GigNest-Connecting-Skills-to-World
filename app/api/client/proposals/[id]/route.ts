@@ -93,7 +93,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                     data: {
                         userId: proposal.freelancerId,
                         type: 'PROPOSAL_REJECTED',
-                        message: `Your proposal for "\${proposal.job.title}" was declined by the client.`
+                        message: `Your proposal for "${proposal.job.title}" was declined by the client.`
                     }
                 });
             }

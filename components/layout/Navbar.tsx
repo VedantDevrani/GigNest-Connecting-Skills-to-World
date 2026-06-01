@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { Logo } from './Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 const navLinks = [
+    { name: 'Home', href: '/' },
     { name: 'Find Work', href: '/jobs' },
-    { name: 'Hire Talent', href: '/freelancers' },
     { name: 'About Us', href: '/about' },
     { name: 'Contact', href: '/contact' },
 ];
@@ -37,32 +38,22 @@ export const Navbar = () => {
     return (
         <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 sm:px-6 pointer-events-none">
             <motion.header
-                initial={{ y: -40, opacity: 0 }}
+                initial={false}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-                className={`w-full max-w-7xl pointer-events-auto transition-all duration-300 rounded-2xl md:rounded-full ${scrolled
+                className={`w-full max-w-7xl pointer-events-auto transition-all duration-200 rounded-2xl md:rounded-full ${scrolled
                     ? 'bg-white/70 dark:bg-[#111827]/70 backdrop-blur-xl shadow-lg border border-white/20 dark:border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
                     : 'bg-white/40 dark:bg-black/20 backdrop-blur-sm border border-transparent'
                     }`}
             >
                 <div className="px-5 md:px-6 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <motion.div
-                            whileHover={{ rotate: 10, scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="w-10 h-10 rounded-full md:rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30 transition-shadow shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
-                        >
-                            <span className="text-white font-bold text-2xl leading-none pt-0.5">G</span>
-                        </motion.div>
-                        <span className="text-xl font-bold tracking-tight text-foreground hidden sm:block">Gig<span className="text-primary">Nest</span></span>
-                    </Link>
+                    <Logo variant="navbar" priority />
 
                     {/* Desktop Nav - No background container box anymore */}
                     <nav className="hidden md:flex items-center gap-1 md:gap-2 px-2 py-1.5">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href;
                             return (
-                                <Link key={link.name} href={link.href} className="relative px-4 py-1.5 rounded-full group">
+                                <Link key={link.name} href={link.href} prefetch className="relative px-4 py-1.5 rounded-full group">
                                     <span className={`relative z-10 text-sm font-medium transition-colors ${isActive ? 'text-primary' : 'text-muted hover:text-foreground'}`}>
                                         {link.name}
                                     </span>

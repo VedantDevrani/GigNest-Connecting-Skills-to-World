@@ -1,66 +1,47 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Search, Filter, DollarSign, Calendar, Target, Briefcase, ChevronLeft, ChevronRight, User, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { PageLoader } from '@/components/ui/PageLoader';
+import { useCachedFetch } from '@/hooks/useCachedFetch';
 
 export default function FreelancerFindJobsPage() {
-    const [jobs, setJobs] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    // Search & Filters
     const [search, setSearch] = useState('');
     const [minBudget, setMinBudget] = useState('');
     const [skillsQuery, setSkillsQuery] = useState('');
-
-    // Pagination
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalJobs, setTotalJobs] = useState(0);
+    const [filterKey, setFilterKey] = useState('default');
 
-    const fetchJobs = async () => {
-        setLoading(true);
-        try {
-            const query = new URLSearchParams({
-                q: search,
-                minBudget: minBudget || '0',
-                skills: skillsQuery,
-                page: page.toString(),
-                limit: '10'
-            });
+    const query = new URLSearchParams({
+        q: search,
+        minBudget: minBudget || '0',
+        skills: skillsQuery,
+        page: page.toString(),
+        limit: '10',
+    });
 
-            const res = await fetch(`/api/freelancer/jobs?\${query.toString()}`);
-            if (!res.ok) throw new Error('Failed to fetch jobs');
-            const data = await res.json();
+    const cacheKey = `freelancer-jobs-${filterKey}-p${page}`;
+    const { data, loading, error } = useCachedFetch<{
+        jobs: any[];
+        pagination: { totalPages: number; total: number };
+    }>(cacheKey, `/api/freelancer/jobs?${query.toString()}`);
 
-            setJobs(data.jobs || []);
-            setTotalPages(data.pagination?.totalPages || 1);
-            setTotalJobs(data.pagination?.total || 0);
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Refetch on page change or filter submit
-    useEffect(() => {
-        fetchJobs();
-    }, [page]);
+    const jobs = data?.jobs ?? [];
+    const totalPages = data?.pagination?.totalPages ?? 1;
+    const totalJobs = data?.pagination?.total ?? 0;
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        setPage(1); // Reset to page 1 on new search
-        fetchJobs();
+        setPage(1);
+        setFilterKey(`${search}-${minBudget}-${skillsQuery}-${Date.now()}`);
     };
 
     return (
-        <div className="space-y-6 fade-in max-w-6xl mx-auto">
+        <div className="space-y-6 max-w-6xl mx-auto">
 
             {/* Header & Search Bar */}
             <div className="flex flex-col md:flex-row gap-6 md:items-end justify-between bg-primary/5 dark:bg-primary/10 p-6 rounded-2xl border border-primary/10 dark:border-primary/20">
@@ -137,8 +118,8 @@ export default function FreelancerFindJobsPage() {
                         <p className="font-medium text-gray-600 dark:text-gray-400">Showing {totalJobs} {totalJobs === 1 ? 'Job' : 'Jobs'}</p>
                     </div>
 
-                    {loading ? (
-                        <div className="py-12 text-center text-gray-500 animate-pulse">Searching for perfect matches...</div>
+                    {loading && jobs.length === 0 ? (
+                        <PageLoader text="Searching for jobs..." />
                     ) : error ? (
                         <div className="py-12 text-center text-red-500">{error}</div>
                     ) : jobs.length === 0 ? (
@@ -153,7 +134,7 @@ export default function FreelancerFindJobsPage() {
                         <div className="space-y-4">
                             <AnimatePresence>
                                 {jobs.map((job) => (
-                                    <motion.div key={job.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+                                    <motion.div key={job.id} layout initial={false} animate={{ opacity: 1 }} whileHover={{ y: -2 }} transition={{ duration: 0.15 }}>
                                         <Card className="p-6 bg-white dark:bg-gray-900 hover:shadow-lg transition-all border-gray-100 dark:border-gray-800 overflow-hidden relative group cursor-pointer">
 
                                             {/* Top indicators */}
@@ -166,7 +147,7 @@ export default function FreelancerFindJobsPage() {
                                                 </div>
 
                                                 {/* Match Percentage Badge */}
-                                                <div className={`px-3 py-1.5 rounded-full text-xs font-bold border \${
+                                                <div className={`px-3 py-1.5 rounded-full text-xs font-bold border ${
                                                     job.matchPercentage >= 80 
                                                         ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' 
                                                         : job.matchPercentage >= 50
@@ -200,7 +181,7 @@ export default function FreelancerFindJobsPage() {
                                             <div className="flex sm:items-center flex-col sm:flex-row gap-4 pt-4 border-t border-gray-100 dark:border-gray-800 justify-between">
                                                 <div className="flex items-center gap-6">
                                                     <span className="flex items-center gap-1.5 text-sm font-bold text-gray-900 dark:text-white">
-                                                        <DollarSign className="w-4 h-4 text-primary" /> $\${job.budget} Fixed
+                                                        <DollarSign className="w-4 h-4 text-primary" /> ${job.budget} Fixed
                                                     </span>
                                                     <span className="flex items-center gap-1.5 text-sm font-medium text-gray-500">
                                                         <Calendar className="w-4 h-4" /> Due: {new Date(job.deadline).toLocaleDateString()}
@@ -209,7 +190,7 @@ export default function FreelancerFindJobsPage() {
                                                         <FileText className="w-4 h-4" /> {job._count?.proposals} Proposals
                                                     </span>
                                                 </div>
-                                                <Link href={`/freelancer/jobs/${job.id}`}>
+                                                <Link href={`/freelancer/jobs/${job.id}`} prefetch>
                                                     <Button size="sm" variant="outline" className="group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                                                         Apply Now
                                                     </Button>

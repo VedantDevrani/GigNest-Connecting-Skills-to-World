@@ -21,8 +21,8 @@ export function SeedButton() {
     }
 
     return (
-        <Button onClick={handleSeed} disabled={loading} className="w-full sm:w-auto">
-            {loading ? 'Generating Dummy Data...' : 'Seed 4 Dummy Jobs to Test'}
+        <Button onClick={handleSeed} loading={loading} className="w-full sm:w-auto">
+            {loading ? 'Generating...' : 'Seed 4 Dummy Jobs to Test'}
         </Button>
     )
 }

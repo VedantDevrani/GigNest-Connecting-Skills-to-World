@@ -4,8 +4,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { JobSearchFilter } from './JobSearchFilter';
 import { SeedButton } from './SeedButton';
+import { ApplyButton } from './ApplyButton';
 import { MapPin, Clock, DollarSign, Building2, ChevronRight } from 'lucide-react';
 import prisma from '@/lib/prisma';
+import { getSession } from '@/lib/session';
 import Image from 'next/image';
 
 // Force dynamic since search params change
@@ -17,6 +19,10 @@ export default async function JobsPage(props: {
     const params = await props.searchParams;
     const search = params?.search;
     const skill = params?.skill;
+
+    // Check if the user is logged in (server-side)
+    const session = await getSession();
+    const isLoggedIn = !!session;
 
     const whereClause: any = { status: 'OPEN' };
 
@@ -186,9 +192,7 @@ export default async function JobsPage(props: {
                                                 </div>
                                             </div>
 
-                                            <Button className="w-full flex justify-between items-center">
-                                                Apply <ChevronRight className="w-4 h-4 ml-1" />
-                                            </Button>
+                                            <ApplyButton jobId={job.id} isLoggedIn={isLoggedIn} />
                                         </div>
                                     </div>
                                 </Link>

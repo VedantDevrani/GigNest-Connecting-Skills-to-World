@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const { id } = await params;
     const user = await prisma.user.findUnique({ where: { id }, select: { name: true } });
     if (!user) return { title: 'Profile Not Found' };
-    return { title: `\${user.name} | GigNest Profile` };
+    return { title: `${user.name} | GigNest Profile` };
 }
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -71,7 +71,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                 {user.role === 'FREELANCER' && (
                                     <div className="bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-4 py-2 rounded-xl text-center shadow-sm">
                                         <div className="text-xs uppercase tracking-wider font-bold mb-0.5">Hourly Rate</div>
-                                        <div className="text-xl font-black">$\${user.hourlyRate || '0'}<span className="text-sm font-medium opacity-60">/hr</span></div>
+                                        <div className="text-xl font-black">${user.hourlyRate || '0'}<span className="text-sm font-medium opacity-60">/hr</span></div>
                                     </div>
                                 )}
                             </div>
@@ -121,7 +121,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                                 <div className="font-bold text-gray-900 dark:text-white">{review.reviewer.name}</div>
                                                 <div className="flex text-yellow-500">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <Star key={i} className={`w-4 h-4 \${i < review.rating ? 'fill-current' : 'text-gray-300 dark:text-gray-700'}`} />
+                                                        <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-gray-300 dark:text-gray-700'}`} />
                                                     ))}
                                                 </div>
                                             </div>

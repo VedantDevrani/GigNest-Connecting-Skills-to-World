@@ -11,6 +11,7 @@ import {
   ChevronLeft, ChevronRight, Quote, Clock, MapPin, DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import heroHome from '@/assets/hero_home.png';
 
 // Smooth Counter component
 function AnimatedCounter({ end, suffix = "+" }: { end: number, suffix?: string }) {
@@ -75,92 +76,100 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#0a0a0a] font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+    <main className="min-h-screen bg-white dark:bg-[#0a0a0a] font-sans text-gray-900 dark:text-gray-100 overflow-x-clip">
 
       {/* 1. HERO SECTION */}
-      <section className="relative w-full bg-gradient-to-b from-[#faf9ff] to-white dark:from-[#13111c] dark:to-[#0a0a0a] pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden border-b border-gray-100 dark:border-gray-800">
+      <section className="relative w-full bg-gradient-to-b from-[#faf9ff] to-white dark:from-[#13111c] dark:to-[#0a0a0a] pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-visible border-b border-gray-100 dark:border-gray-800">
         {/* Background Decorative Blobs */}
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[120%] bg-primary/5 blur-[100px] rounded-full point-events-none"></div>
         <div className="absolute top-[20%] right-[-15%] w-[60%] h-[150%] bg-blue-500/5 blur-[120px] rounded-full point-events-none"></div>
 
-        <div className="max-w-[1280px] mx-auto px-6 relative z-10 flex flex-col lg:flex-row items-center justify-between">
+        <div className="max-w-[1280px] mx-auto px-6 lg:px-10 relative z-10 flex flex-col">
 
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="w-full lg:w-[55%] pb-8 pr-4"
-          >
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm mb-8 w-max">
-              <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">Over <strong className="text-gray-900 dark:text-white">10,000+</strong> active jobs worldwide</span>
-            </motion.div>
-
-            <motion.h1
-              variants={fadeInUp}
-              className="text-5xl md:text-7xl font-bold font-poppins leading-[1.1] tracking-tight mb-6"
+          {/* Top row: headline + illustration */}
+          <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8 xl:gap-10">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="w-full lg:w-[48%] pb-8 lg:pb-0 pr-4 flex flex-col items-start"
             >
-              Hire the world's best <br className="hidden md:block" />
-              <span className="relative inline-flex items-center">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">freelance talent.</span>
-                <BadgeCheck className="w-8 h-8 md:w-12 md:h-12 text-blue-500 ml-2 mt-2 absolute -right-10 md:-right-14 hidden sm:block" fill="#3b82f6" stroke="white" />
-              </span>
-            </motion.h1>
+              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm mb-8 w-max">
+                <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">Over <strong className="text-gray-900 dark:text-white">10,000+</strong> active jobs worldwide</span>
+              </motion.div>
 
-            <motion.p variants={fadeInUp} className="text-gray-500 dark:text-gray-400 text-lg md:text-xl max-w-lg mb-10 leading-relaxed">
-              Find the perfect match for your project, scale your team seamlessly, and get work done faster than ever. The #1 destination for top-tier remote work.
-            </motion.p>
+              <motion.h1
+                variants={fadeInUp}
+                className="text-5xl md:text-7xl font-bold font-poppins leading-[1.1] tracking-tight mb-6"
+              >
+                Hire the world's best <br className="hidden md:block" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">freelance </span>
+                <span className="inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap align-middle">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">talent.</span>
+                  <BadgeCheck className="hidden sm:inline-block w-7 h-7 md:w-9 md:h-9 lg:w-10 lg:h-10 text-blue-500 shrink-0" fill="#3b82f6" stroke="white" />
+                </span>
+              </motion.h1>
 
-            {/* CTAs */}
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center gap-4 mb-12 w-full">
-              <Link href="/freelancers" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto px-8 py-5 text-lg shadow-lg hover:shadow-primary/25 hover:scale-105 transition-all">
-                  Hire Talent Now <ArrowUpRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              <Link href="/jobs" className="w-full sm:w-auto">
-                <Button variant="secondary" className="w-full sm:w-auto px-8 py-5 text-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 transition-all">
-                  Find Work Instead
-                </Button>
-              </Link>
+              <motion.p variants={fadeInUp} className="text-gray-500 dark:text-gray-400 text-lg md:text-xl max-w-lg mb-10 leading-relaxed">
+                Find the perfect match for your project, scale your team seamlessly, and get work done faster than ever. The #1 destination for top-tier remote work.
+              </motion.p>
+
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-4 w-full max-w-xl">
+                <Link href="/freelancers" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto px-8 py-5 text-lg shadow-lg hover:shadow-primary/25 hover:scale-105 transition-all">
+                    Hire Talent Now <ArrowUpRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                <Link href="/jobs" className="w-full sm:w-auto">
+                  <Button variant="secondary" className="w-full sm:w-auto px-8 py-5 text-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 transition-all">
+                    Find Work Instead
+                  </Button>
+                </Link>
+              </motion.div>
             </motion.div>
 
-            {/* Search Bar */}
-            <motion.div variants={fadeInUp} className="w-full max-w-xl bg-white dark:bg-gray-900 p-2 md:p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-gray-100 dark:border-gray-800">
-              <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-2">
-                <div className="flex-1 w-full flex items-center px-4 py-2 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-800">
-                  <Search className="w-5 h-5 text-gray-400 mr-3" />
-                  <input
-                    type="text"
-                    placeholder="Job title, keywords, or company"
-                    className="w-full bg-transparent outline-none text-gray-700 dark:text-gray-200 text-sm font-medium"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" className="w-full sm:w-auto px-6 py-3 sm:ml-2 rounded-xl">
-                  Search Jobs
-                </Button>
-              </form>
+            {/* Right Hero Image */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="w-full lg:w-[52%] lg:shrink-0 relative mt-16 lg:mt-0 flex justify-center lg:justify-center lg:pr-4 xl:pr-6 lg:-translate-y-[4.5rem] xl:-translate-y-24"
+            >
+              <div className="relative w-full max-w-[680px] lg:max-w-none lg:w-full h-[420px] sm:h-[500px] lg:h-[640px] xl:h-[720px] drop-shadow-2xl lg:scale-105 xl:scale-[1.18] lg:origin-center">
+                <Image
+                  src={heroHome}
+                  alt="Modern Freelancer Illustration"
+                  fill
+                  className="object-contain object-center"
+                  priority
+                />
+              </div>
             </motion.div>
-          </motion.div>
+          </div>
 
-          {/* Right Hero Image */}
+          {/* Search bar — separate row below hero content */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="w-full lg:w-[45%] relative mt-16 lg:mt-0 flex justify-center"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full max-w-3xl mx-auto mt-10 lg:mt-14 bg-white dark:bg-gray-900 p-2 md:p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-gray-100 dark:border-gray-800"
           >
-            <div className="relative w-full max-w-[500px] aspect-square drop-shadow-2xl">
-              <Image
-                src="/hero_home.png"
-                alt="Modern Freelancer Illustration"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
+            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-2">
+              <div className="flex-1 w-full flex items-center px-4 py-2 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-800">
+                <Search className="w-5 h-5 text-gray-400 mr-3" />
+                <input
+                  type="text"
+                  placeholder="Job title, keywords, or company"
+                  className="w-full bg-transparent outline-none text-gray-700 dark:text-gray-200 text-sm font-medium"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Button type="submit" className="w-full sm:w-auto px-6 py-3 sm:ml-2 rounded-xl">
+                Search Jobs
+              </Button>
+            </form>
           </motion.div>
         </div>
       </section>

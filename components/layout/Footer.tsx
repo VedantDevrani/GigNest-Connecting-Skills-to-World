@@ -1,14 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
+import { Logo } from './Logo';
 
 export function Footer() {
     return (
         <footer className="bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
             <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
                 <div className="col-span-2 lg:col-span-2">
-                    <Link href="/" className="font-poppins font-bold text-2xl text-primary tracking-tight mb-4 block">
-                        GigNest<span className="text-accent">.</span>
-                    </Link>
+                    <Logo variant="footer" className="mb-4" />
                     <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed max-w-sm mb-6">
                         Connecting world-class freelance talent with ambitious companies. Build your dream team, faster.
                     </p>

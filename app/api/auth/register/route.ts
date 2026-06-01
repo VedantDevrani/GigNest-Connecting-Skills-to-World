@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { hashPassword, generateToken } from '@/lib/auth';
+import { generateAvatar } from '@/lib/avatar';
 
 export async function POST(req: Request) {
     try {
@@ -21,12 +22,16 @@ export async function POST(req: Request) {
 
         const hashedPassword = await hashPassword(password);
 
+        // Seed by email (unique in DB) → every user gets a distinct avatar
+        const avatarUrl = await generateAvatar(email);
+
         const newUser = await prisma.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
                 role: role === 'FREELANCER' ? 'FREELANCER' : 'CLIENT',
+                avatarUrl,
             },
         });
 
@@ -39,6 +44,7 @@ export async function POST(req: Request) {
                 name: newUser.name,
                 email: newUser.email,
                 role: newUser.role,
+                avatarUrl: newUser.avatarUrl,
             }
         }, { status: 201 });
 

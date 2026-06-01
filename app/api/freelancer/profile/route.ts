@@ -19,7 +19,7 @@ export async function GET() {
 
         const user = await prisma.user.findUnique({
             where: { id: userToken.id },
-            select: { id: true, name: true, email: true, bio: true, skills: true, hourlyRate: true, createdAt: true }
+            select: { id: true, name: true, email: true, bio: true, avatarUrl: true, skills: true, hourlyRate: true, createdAt: true }
         });
 
         return NextResponse.json({ user });
@@ -46,7 +46,7 @@ export async function PATCH(req: NextRequest) {
                 ...(body.hourlyRate !== undefined && { hourlyRate: parseFloat(body.hourlyRate) || 0 }),
                 ...(body.skills && { skills: body.skills }),
             },
-            select: { id: true, name: true, email: true, bio: true, skills: true, hourlyRate: true }
+            select: { id: true, name: true, email: true, bio: true, avatarUrl: true, skills: true, hourlyRate: true }
         });
 
         return NextResponse.json({ user: updatedUser }, { status: 200 });
