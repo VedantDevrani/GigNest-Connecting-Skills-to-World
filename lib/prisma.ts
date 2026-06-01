@@ -4,7 +4,9 @@ import { PrismaPg } from '@prisma/adapter-pg'
 
 const prismaClientSingleton = () => {
     if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('postgres')) {
-        return new PrismaClient()
+        return new Proxy({} as any, {
+            get: () => () => { throw new Error("Database accessed during build phase without DATABASE_URL"); }
+        });
     }
     const connectionString = `${process.env.DATABASE_URL}`
     const pool = new Pool({ connectionString })

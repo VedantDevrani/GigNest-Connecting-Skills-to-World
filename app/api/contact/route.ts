@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Basic in-memory rate limiting map
 // Key: IP address, Value: { count: number, resetTime: number }
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -61,6 +59,7 @@ export async function POST(req: Request) {
         }
 
         // Send Email using Resend
+        const resend = new Resend(process.env.RESEND_API_KEY);
         const data = await resend.emails.send({
             from: 'Gignest Contact <onboarding@resend.dev>',
             to: ['vedantdevrani177@gmail.com'],
