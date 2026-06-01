@@ -34,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             return NextResponse.json({ error: 'Contract is already paid' }, { status: 400 });
         }
 
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
             const updated = await tx.contract.update({
                 where: { id: contractId },
                 data: {

@@ -35,7 +35,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         }
 
         // Use a transaction
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
             const updatedProposal = await tx.proposal.update({
                 where: { id: proposalId },
                 data: { status }
