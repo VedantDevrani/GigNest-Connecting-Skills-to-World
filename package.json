@@ -6,12 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@dicebear/collection": "^9.4.2",
     "@dicebear/core": "^9.4.2",
     "@prisma/adapter-pg": "^7.6.0",
+    "@prisma/client": "^7.6.0",
     "@types/pg": "^8.20.0",
     "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
@@ -31,7 +33,6 @@
     "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
-    "@prisma/client": "^7.6.0",
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie": "^0.6.0",
