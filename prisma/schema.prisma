@@ -7,30 +7,30 @@ datasource db {
 }
 
 model User {
-  id                     String         @id @default(cuid())
-  name                   String
-  email                  String         @unique
-  password               String
-  role                   Role           @default(CLIENT)
-  avatarUrl              String?
-  bio                    String?
-  hourlyRate             Float?
-  skills                 String[]
-  availabilityStatus     AvailabilityStatus @default(AVAILABLE)
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
-  clientContracts        Contract[]     @relation("ClientContracts")
-  freelancerContracts    Contract[]     @relation("FreelancerContracts")
-  clientJobs             Job[]          @relation("ClientJobs")
-  notifications          Notification[]
-  portfolios             Portfolio[]
-  proposals              Proposal[]
-  receivedReviews        Review[]       @relation("ReviewsReceived")
-  givenReviews           Review[]       @relation("ReviewsGiven")
-  savedJobs              SavedJob[]
-  clientConversations    Conversation[] @relation("ClientConversations")
-  freelancerConversations Conversation[] @relation("FreelancerConversations")
-  sentMessages           Message[]      @relation("SentMessages")
+  id                      String             @id @default(cuid())
+  name                    String
+  email                   String             @unique
+  password                String
+  role                    Role               @default(CLIENT)
+  bio                     String?
+  hourlyRate              Float?
+  skills                  String[]
+  availabilityStatus      AvailabilityStatus @default(AVAILABLE)
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  avatarUrl               String?
+  clientContracts         Contract[]         @relation("ClientContracts")
+  freelancerContracts     Contract[]         @relation("FreelancerContracts")
+  clientConversations     Conversation[]     @relation("ClientConversations")
+  freelancerConversations Conversation[]     @relation("FreelancerConversations")
+  clientJobs              Job[]              @relation("ClientJobs")
+  sentMessages            Message[]          @relation("SentMessages")
+  notifications           Notification[]
+  portfolios              Portfolio[]
+  proposals               Proposal[]
+  receivedReviews         Review[]           @relation("ReviewsReceived")
+  givenReviews            Review[]           @relation("ReviewsGiven")
+  savedJobs               SavedJob[]
 }
 
 model Job {
@@ -75,8 +75,8 @@ model Contract {
   client        User           @relation("ClientContracts", fields: [clientId], references: [id])
   freelancer    User           @relation("FreelancerContracts", fields: [freelancerId], references: [id])
   job           Job            @relation(fields: [jobId], references: [id])
-  reviews       Review[]
   conversation  Conversation?
+  reviews       Review[]
 }
 
 model Conversation {
@@ -86,19 +86,19 @@ model Conversation {
   freelancerId String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  contract     Contract  @relation(fields: [contractId], references: [id])
   client       User      @relation("ClientConversations", fields: [clientId], references: [id])
+  contract     Contract  @relation(fields: [contractId], references: [id])
   freelancer   User      @relation("FreelancerConversations", fields: [freelancerId], references: [id])
   messages     Message[]
 }
 
 model Message {
   id             String       @id @default(cuid())
-  conversationId String
   senderId       String
   content        String
-  isRead         Boolean      @default(false)
   createdAt      DateTime     @default(now())
+  conversationId String
+  isRead         Boolean      @default(false)
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   sender         User         @relation("SentMessages", fields: [senderId], references: [id])
 }
@@ -146,6 +146,17 @@ model Notification {
   isRead    Boolean          @default(false)
   createdAt DateTime         @default(now())
   user      User             @relation(fields: [userId], references: [id])
+}
+
+model PendingSignup {
+  email          String   @id
+  name           String
+  hashedPassword String
+  role           Role
+  hashedOtp      String
+  expiresAt      DateTime
+  attempts       Int      @default(0)
+  createdAt      DateTime @default(now())
 }
 
 enum Role {

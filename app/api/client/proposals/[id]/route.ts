@@ -53,22 +53,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                     }
                 });
 
-                // Reject all other pending proposals for this job
-                await tx.proposal.updateMany({
-                    where: {
-                        jobId: proposal.jobId,
-                        id: { not: proposalId },
-                        status: 'PENDING'
-                    },
-                    data: { status: 'REJECTED' }
-                });
-
-                // Update job status to CLOSED
-                await tx.job.update({
-                    where: { id: proposal.jobId },
-                    data: { status: 'CLOSED' }
-                });
-
                 // Notify freelancer
                 await tx.notification.create({
                     data: {
