@@ -60,7 +60,7 @@ export async function GET(
             where: { conversationId },
             orderBy: { createdAt: 'asc' },
             include: {
-                sender: { select: { id: true, name: true } },
+                sender: { select: { id: true, name: true, avatarUrl: true } },
             },
         });
 
@@ -132,7 +132,7 @@ export async function POST(
                 content: content.trim(),
             },
             include: {
-                sender: { select: { id: true, name: true } },
+                sender: { select: { id: true, name: true, avatarUrl: true } },
             },
         });
 

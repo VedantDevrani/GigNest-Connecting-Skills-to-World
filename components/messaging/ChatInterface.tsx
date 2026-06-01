@@ -9,6 +9,7 @@ import {
     Check,
     CheckCheck,
     Briefcase,
+    ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Loader } from '@/components/ui/Loader';
@@ -64,7 +65,6 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isTyping, setIsTyping] = useState(false);
-    const [socketError, setSocketError] = useState<string | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -128,7 +128,6 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
             });
 
             sock.on('connect', () => {
-                setSocketError(null);
                 if (activeConversationRef.current) {
                     sock.emit('joinConversation', activeConversationRef.current.id);
                 }
@@ -136,7 +135,6 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
 
             sock.on('connect_error', (err) => {
                 console.error('[Socket] Connect error:', err.message);
-                setSocketError('Real-time connection unavailable. Messages will still send.');
             });
 
             sock.on('receiveMessage', (message: Message) => {
@@ -367,21 +365,15 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
     // ── Render ────────────────────────────────────────────────────────────────
 
     return (
-        <div className="fade-in h-[calc(100vh-5rem)] flex flex-col pt-1">
-            <h1 className="text-lg font-bold font-poppins text-gray-900 dark:text-white mb-3">
+        <div className="fade-in h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] flex flex-col pt-0 md:pt-1">
+            <h1 className="text-lg font-bold font-poppins text-gray-900 dark:text-white mb-3 hidden md:block">
                 Contract-based Conversations
             </h1>
 
-            {socketError && (
-                <div className="mb-3 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-sm text-amber-700 dark:text-amber-300">
-                    ⚠️ {socketError}
-                </div>
-            )}
-
-            <Card className="flex-1 bg-white dark:bg-gray-900 shadow-sm border-gray-100 dark:border-gray-800 flex overflow-hidden">
+            <Card className="flex-1 bg-white dark:bg-gray-900 shadow-sm border-gray-100 dark:border-gray-800 flex overflow-hidden rounded-none md:rounded-xl border-x-0 md:border-x">
 
                 {/* ── Left Pane — Conversation Sidebar ────────────────────── */}
-                <div className="w-[72px] md:w-[300px] lg:w-1/3 border-r border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col shrink-0 transition-all">
+                <div className={`${activeConversation ? 'hidden md:flex' : 'flex'} w-full md:w-[300px] lg:w-1/3 border-r border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex-col shrink-0 transition-all`}>
                     <div className="p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 hidden md:block">
                         <div className="text-sm font-bold text-gray-400 uppercase tracking-wider">
                             Active Contracts
@@ -396,10 +388,10 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                         ) : conversations.length === 0 ? (
                             <div className="flex flex-col items-center justify-center p-8 text-center opacity-50 h-full">
                                 <Briefcase className="w-8 h-8 text-gray-400 mb-2" />
-                                <p className="text-sm text-gray-500 font-medium hidden md:block">
+                                <p className="text-sm text-gray-500 font-medium">
                                     No active contracts yet
                                 </p>
-                                <p className="text-xs text-gray-400 mt-1 hidden md:block">
+                                <p className="text-xs text-gray-400 mt-1">
                                     Chats appear automatically when a contract starts
                                 </p>
                             </div>
@@ -428,9 +420,13 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                             <div className="flex items-center gap-3">
                                                 {/* Avatar */}
                                                 <div className="relative shrink-0">
-                                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                                                        {conv.otherParty?.name?.charAt(0)?.toUpperCase() ?? '?'}
-                                                    </div>
+                                                    {conv.otherParty?.avatarUrl ? (
+                                                        <img src={conv.otherParty.avatarUrl} alt={conv.otherParty.name} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                                                            {conv.otherParty?.name?.charAt(0)?.toUpperCase() ?? '?'}
+                                                        </div>
+                                                    )}
                                                     {conv.unreadCount > 0 && (
                                                         <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                                                             {conv.unreadCount > 9 ? '9+' : conv.unreadCount}
@@ -439,7 +435,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                                 </div>
 
                                                 {/* Contact Info */}
-                                                <div className="flex-1 min-w-0 hidden md:block">
+                                                <div className="flex-1 min-w-0">
                                                     <div className="flex items-baseline justify-between gap-2">
                                                         <h4 className={`font-bold truncate ${conv.unreadCount > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200'}`}>
                                                             {conv.otherParty?.name ?? 'Unknown User'}
@@ -470,7 +466,7 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                 </div>
 
                 {/* ── Right Pane — Chat Window ─────────────────────────────── */}
-                <div className="flex-1 flex flex-col bg-white dark:bg-[#0c1017] min-w-0">
+                <div className={`${!activeConversation ? 'hidden md:flex' : 'flex'} flex-1 flex-col bg-white dark:bg-[#0c1017] min-w-0`}>
                     {!activeConversation ? (
                         <div className="flex-1 flex items-center justify-center p-8">
                             <div className="text-center opacity-50 max-w-xs">
@@ -486,10 +482,20 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                     ) : (
                         <>
                             {/* Chat Header */}
-                            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-4 bg-white dark:bg-gray-900 shrink-0">
-                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
-                                    {activeConversation.otherParty?.name?.charAt(0)?.toUpperCase() ?? '?'}
-                                </div>
+                            <div className="px-3 md:px-5 py-3 md:py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 bg-white dark:bg-gray-900 shrink-0">
+                                <button
+                                    onClick={() => setActiveConversation(null)}
+                                    className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-lg transition-colors"
+                                >
+                                    <ArrowLeft className="w-5 h-5" />
+                                </button>
+                                {activeConversation.otherParty?.avatarUrl ? (
+                                    <img src={activeConversation.otherParty.avatarUrl} alt={activeConversation.otherParty.name} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                                ) : (
+                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
+                                        {activeConversation.otherParty?.name?.charAt(0)?.toUpperCase() ?? '?'}
+                                    </div>
+                                )}
                                 <div className="flex-1 min-w-0">
                                     <Link
                                         href={`/profile/${activeConversation.otherParty.id}`}
@@ -538,9 +544,13 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                                         className={`flex w-full mt-3 ${isMe ? 'justify-end' : 'justify-start'}`}
                                                     >
                                                         {!isMe && (
-                                                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 mr-2 mt-1">
-                                                                {msg.sender.name.charAt(0).toUpperCase()}
-                                                            </div>
+                                                            msg.sender.avatarUrl ? (
+                                                                <img src={msg.sender.avatarUrl} alt={msg.sender.name} className="w-7 h-7 rounded-full object-cover shrink-0 mr-2 mt-1 shadow-sm" />
+                                                            ) : (
+                                                                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 mr-2 mt-1">
+                                                                    {msg.sender.name.charAt(0).toUpperCase()}
+                                                                </div>
+                                                            )
                                                         )}
 
                                                         <div className={`max-w-[80%] md:max-w-[65%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
@@ -567,6 +577,16 @@ export function ChatInterface({ role }: { role: 'CLIENT' | 'FREELANCER' }) {
                                                                 )}
                                                             </div>
                                                         </div>
+
+                                                        {isMe && (
+                                                            msg.sender.avatarUrl ? (
+                                                                <img src={msg.sender.avatarUrl} alt={msg.sender.name} className="w-7 h-7 rounded-full object-cover shrink-0 ml-2 mt-1 shadow-sm" />
+                                                            ) : (
+                                                                <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs shrink-0 ml-2 mt-1 shadow-sm">
+                                                                    {msg.sender.name.charAt(0).toUpperCase()}
+                                                                </div>
+                                                            )
+                                                        )}
                                                     </motion.div>
                                                 );
                                             })}

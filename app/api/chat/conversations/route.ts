@@ -37,8 +37,8 @@ export async function GET() {
                 ],
             },
             include: {
-                client: { select: { id: true, name: true } },
-                freelancer: { select: { id: true, name: true } },
+                client: { select: { id: true, name: true, avatarUrl: true } },
+                freelancer: { select: { id: true, name: true, avatarUrl: true } },
                 job: { select: { title: true } },
             },
         });
@@ -59,8 +59,8 @@ export async function GET() {
                         take: 1,
                         select: { content: true, createdAt: true, senderId: true, isRead: true },
                     },
-                    client: { select: { id: true, name: true } },
-                    freelancer: { select: { id: true, name: true } },
+                    client: { select: { id: true, name: true, avatarUrl: true } },
+                    freelancer: { select: { id: true, name: true, avatarUrl: true } },
                     contract: { select: { status: true, job: { select: { title: true } } } },
                 },
             })

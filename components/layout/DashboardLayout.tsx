@@ -290,8 +290,8 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                 </header>
 
                 {/* Scrollable Children Container */}
-                <div className="flex-1 overflow-auto p-4 sm:p-8 w-full block">
-                    <div className="max-w-7xl mx-auto w-full">
+                <div className={`flex-1 overflow-auto w-full block ${pathname?.includes('/messages') ? 'p-0 md:p-4 lg:p-8' : 'p-4 sm:p-8'}`}>
+                    <div className={`mx-auto w-full ${pathname?.includes('/messages') ? 'max-w-full h-full' : 'max-w-7xl'}`}>
                         {children}
                     </div>
                 </div>
