@@ -34,6 +34,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             return NextResponse.json({ error: 'Proposal not found or unauthorized' }, { status: 404 });
         }
 
+        if (proposal.status !== 'PENDING') {
+            return NextResponse.json({ error: 'Proposal is already processed' }, { status: 400 });
+        }
+
         // Use a transaction
         const result = await prisma.$transaction(async (tx: any) => {
             const updatedProposal = await tx.proposal.update({

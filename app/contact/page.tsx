@@ -7,6 +7,10 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
+import dynamic from 'next/dynamic';
+import animationData from '@/assets/animation.json';
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -100,31 +104,19 @@ export default function ContactPage() {
                 <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="grid grid-cols-1 lg:grid-cols-2 gap-16">
 
                     {/* LEFT COLUMN: Contact Info */}
-                    <motion.div variants={fadeInUp} className="space-y-12">
+                    <motion.div variants={fadeInUp} className="flex flex-col gap-2 md:gap-4">
                         <div>
-                            <h1 className="text-5xl font-bold font-poppins mb-6 tracking-tight">Let's start a <br /> <span className="text-primary">conversation.</span></h1>
-                            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-md">
+                            <h1 className="text-3xl md:text-4xl font-bold font-poppins mb-4 tracking-tight">Let's start a <br /> <span className="text-primary">conversation.</span></h1>
+                            <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed max-w-md">
                                 Whether you have a question about features, pricing, or anything else, our team is ready to answer all your questions.
                             </p>
                         </div>
 
-                        <div className="space-y-8 pt-8 border-t border-gray-100 dark:border-gray-800/50">
-                            {[
-                                { icon: <Mail className="w-6 h-6" />, label: "Chat to us", desc: "Our friendly team is here to help.", info: "hello@gignest.com" },
-                                { icon: <MapPin className="w-6 h-6" />, label: "Office", desc: "Come say hello at our office HQ.", info: "100 Smith Street, Collingwood VIC 3066 AU" },
-                                { icon: <Phone className="w-6 h-6" />, label: "Phone", desc: "Mon-Fri from 8am to 5pm.", info: "+1 (555) 000-0000" },
-                            ].map((item, i) => (
-                                <div key={i} className="flex gap-6 group cursor-pointer">
-                                    <div className="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors shrink-0 shadow-sm border border-gray-100 dark:border-gray-700">
-                                        {item.icon}
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold font-poppins text-lg">{item.label}</h3>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-2">{item.desc}</p>
-                                        <span className="font-medium text-primary hover:underline">{item.info}</span>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="-mt-12 md:-mt-16">
+                            <Lottie animationData={animationData} loop={true} className="w-full max-w-xl mx-auto drop-shadow-2xl transform scale-110 -translate-x-4 md:-translate-x-8" />
+                            <p className="text-center md:text-left text-gray-500 dark:text-gray-400 font-medium mt-6 md:mt-8 md:pl-12">
+                                Hi, i am vedant to connect just mail me from here
+                            </p>
                         </div>
                     </motion.div>
 
@@ -134,7 +126,7 @@ export default function ContactPage() {
                             <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
                                 <MessageSquare className="w-5 h-5" />
                             </div>
-                            <h2 className="text-2xl font-bold font-poppins">Send us a message</h2>
+                            <h2 className="text-2xl font-bold font-poppins">Send me a message</h2>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">

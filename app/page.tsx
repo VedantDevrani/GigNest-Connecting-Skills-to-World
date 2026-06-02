@@ -11,7 +11,10 @@ import {
   ChevronLeft, ChevronRight, Quote, Clock, MapPin, DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import heroHome from '@/assets/hero_home.png';
+import dynamic from 'next/dynamic';
+import heroHomeAnimation from '@/assets/hero_home_animation.json';
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 // Smooth Counter component
 function AnimatedCounter({ end, suffix = "+" }: { end: number, suffix?: string }) {
@@ -134,16 +137,10 @@ export default function Home() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="w-full lg:w-[52%] lg:shrink-0 relative mt-16 lg:mt-0 flex justify-center lg:justify-center lg:pr-4 xl:pr-6 lg:-translate-y-[4.5rem] xl:-translate-y-24"
+              className="w-full lg:w-[52%] lg:shrink-0 relative mt-8 lg:mt-0 flex justify-center lg:justify-center lg:pr-4 xl:pr-6 lg:-translate-y-[4.5rem] xl:-translate-y-24"
             >
-              <div className="relative w-full max-w-[680px] lg:max-w-none lg:w-full h-[420px] sm:h-[500px] lg:h-[640px] xl:h-[720px] drop-shadow-2xl lg:scale-105 xl:scale-[1.18] lg:origin-center">
-                <Image
-                  src={heroHome}
-                  alt="Modern Freelancer Illustration"
-                  fill
-                  className="object-contain object-center"
-                  priority
-                />
+              <div className="relative w-full max-w-[680px] lg:max-w-none lg:w-full h-[280px] sm:h-[400px] lg:h-[640px] xl:h-[720px] drop-shadow-2xl lg:scale-105 xl:scale-[1.18] lg:origin-center flex items-center justify-center">
+                <Lottie animationData={heroHomeAnimation} loop={true} className="w-full h-full transform scale-110 md:scale-[1.35] translate-x-0 md:translate-x-12 lg:translate-x-16" />
               </div>
             </motion.div>
           </div>
