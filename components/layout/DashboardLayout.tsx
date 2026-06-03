@@ -111,7 +111,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     return (
-        <div className="min-h-screen bg-[#fafbfc] dark:bg-gray-950 font-sans flex">
+        <div className="h-screen overflow-hidden bg-[#fafbfc] dark:bg-gray-950 font-sans flex">
 
             {/* Mobile Backdrop */}
             {isSidebarOpen && (
@@ -121,13 +121,12 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                 />
             )}
 
-            {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#f8f9fa] dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className="h-full flex flex-col pointer-events-auto">
                     {/* Logo Area */}
-                    <div className="h-16 flex items-center px-8 border-b border-gray-100 dark:border-gray-800 shrink-0 justify-between lg:justify-start">
+                    <div className="h-[72px] flex items-center px-8 border-b border-gray-100 dark:border-gray-800 shrink-0 justify-between lg:justify-start">
                         <Logo variant="sidebar" />
                         <button className="lg:hidden text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" onClick={() => setSidebarOpen(false)}>
                             <X className="w-5 h-5" />
@@ -168,7 +167,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                     </div>
 
                     {/* Footer User Area */}
-                    <div className="p-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
+                    <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 shrink-0">
                         <button
                             onClick={handleLogout}
                             className="w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
@@ -183,7 +182,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
             <main className="flex-1 flex flex-col min-w-0 transition-transform">
 
                 {/* Top Header */}
-                <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 sm:px-8 shrink-0">
+                <header className="h-[72px] bg-[#f8f9fa] dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 sm:px-8 shrink-0">
                     <div className="flex items-center gap-4">
                         <button
                             className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-primary p-2 -ml-2 rounded-lg transition-colors"
@@ -191,7 +190,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                         >
                             <Menu className="w-6 h-6" />
                         </button>
-                        <h2 className="font-poppins font-bold text-lg text-gray-900 dark:text-white capitalize hidden sm:block">
+                        <h2 className="font-poppins font-bold text-xl text-gray-900 dark:text-white capitalize hidden sm:block">
                             {pathname?.split('/')[2] || 'Dashboard'}
                         </h2>
                     </div>
@@ -200,9 +199,9 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                         <ThemeToggle />
 
                         <div ref={notificationRef}>
-                            <button
+                                <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-primary transition-colors relative"
+                                className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-primary transition-colors relative"
                             >
                                 <Bell className="w-5 h-5" />
                                 {unreadCount > 0 && (
@@ -268,7 +267,10 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                         </div>
                         
                         {/* User Profile Info */}
-                        <div className="flex items-center gap-3 pl-4 border-l border-gray-100 dark:border-gray-800 ml-2">
+                        <Link 
+                            href={userRole === 'CLIENT' ? '/client/profile' : '/freelancer/settings'}
+                            className="flex items-center gap-3 pl-4 border-l border-gray-100 dark:border-gray-800 ml-2 hover:opacity-80 transition-opacity cursor-pointer"
+                        >
                             <div className="hidden sm:block text-right">
                                 <p className="text-sm font-bold text-gray-900 dark:text-white capitalize leading-tight">{userProfile?.name || 'User'}</p>
                                 <p className="text-xs text-gray-400 capitalize">{userRole.toLowerCase()}</p>
@@ -284,7 +286,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                                     {userProfile?.name?.charAt(0).toUpperCase() || 'U'}
                                 </div>
                             )}
-                        </div>
+                        </Link>
 
                     </div>
                 </header>

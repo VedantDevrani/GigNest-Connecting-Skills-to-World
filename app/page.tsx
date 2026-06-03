@@ -313,27 +313,27 @@ export default function Home() {
           <div className="w-[800px] h-[400px] bg-primary rounded-[100%] blur-[120px]"></div>
         </div>
 
-        <div className="max-w-[1000px] mx-auto bg-[#1A162B] rounded-[40px] p-12 md:p-20 text-center relative z-10 shadow-2xl overflow-hidden group">
+        <div className="max-w-[1000px] mx-auto bg-[#D6CFF0] dark:bg-[#1A162B] border border-[#B9AEE1] dark:border-none rounded-[40px] p-12 md:p-20 text-center relative z-10 shadow-2xl overflow-hidden group">
           {/* Animated bg ring inside CTA container */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border-[1px] border-white/5 rounded-full group-hover:scale-110 transition-transform duration-1000"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border-[1px] border-white/10 rounded-full group-hover:scale-105 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border-[1px] border-gray-900/15 dark:border-white/5 rounded-full group-hover:scale-110 transition-transform duration-1000"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border-[1px] border-gray-900/20 dark:border-white/10 rounded-full group-hover:scale-105 transition-transform duration-700"></div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="relative z-10">
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-6xl font-bold font-poppins text-white tracking-tight mb-8">
+            <motion.h2 variants={fadeInUp} className="text-4xl md:text-6xl font-bold font-poppins text-gray-900 dark:text-white tracking-tight mb-8">
               Ready to transform the <br /> way you work?
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-gray-400 text-lg max-w-xl mx-auto mb-12">
+            <motion.p variants={fadeInUp} className="text-gray-600 dark:text-gray-400 text-lg max-w-xl mx-auto mb-12">
               Join thousands of businesses and professionals who are already experiencing the future of work.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/register">
-                <Button className="w-full sm:w-auto px-8 py-6 text-lg bg-white !text-[#1A162B] hover:bg-gray-100 border-none shadow-xl hover:scale-105 transition-all">
+                <Button className="w-full sm:w-auto px-8 py-6 text-lg !bg-gray-900 !text-white hover:!bg-gray-800 dark:!bg-white dark:!text-[#1A162B] dark:hover:!bg-gray-100 border-none shadow-xl hover:scale-105 transition-all">
                   Get Started Now
                 </Button>
               </Link>
               <Link href="/jobs">
-                <Button variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg text-white border-white/20 hover:bg-white/10 hover:text-white transition-all">
+                <Button variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg !text-gray-900 !border-gray-900 hover:!bg-gray-900/10 dark:!text-white dark:!border-white/20 dark:hover:!bg-white/10 dark:hover:!text-white transition-all">
                   Browse Jobs
                 </Button>
               </Link>

@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@variant dark (&:where(.dark, .dark *));
 @theme inline {
   --color-primary: #A182F9;
   --color-primary-light: #DDD2FA;
@@ -15,8 +15,8 @@
 }
 
 :root {
-  --background: #FFFFFF;
-  --foreground: #111827;
+  --background: #f8f9fc;
+  --foreground: #1e1b4b;
   --card: #ffffff;
   /* Loader — bluish palette anchored on #7C5FD4 */
   --loader-dot-light: #B5C4F8;
@@ -25,12 +25,10 @@
   --loader-dot-glow: rgb(124 106 232 / 50%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #111827;
-    --foreground: #F9FAFB;
-    --card: #1F2937;
-  }
+.dark {
+  --background: #111827;
+  --foreground: #F9FAFB;
+  --card: #1F2937;
 }
 
 body {
@@ -214,14 +212,12 @@ h6 {
   background-clip: content-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-thumb {
-    background: rgba(156, 163, 175, 0.2); /* subtle gray for dark mode */
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(156, 163, 175, 0.4);
-  }
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.2); /* subtle gray for dark mode */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.4);
 }
 
 /* Holographic Card Animation */

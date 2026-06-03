@@ -42,7 +42,7 @@ export const Navbar = () => {
                 animate={{ y: 0, opacity: 1 }}
                 className={`w-full max-w-7xl pointer-events-auto transition-all duration-200 rounded-2xl md:rounded-full ${scrolled
                     ? 'bg-white/70 dark:bg-[#111827]/70 backdrop-blur-xl shadow-lg border border-white/20 dark:border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
-                    : 'bg-white/40 dark:bg-black/20 backdrop-blur-sm border border-transparent'
+                    : 'bg-white/60 dark:bg-black/20 backdrop-blur-md shadow-md shadow-gray-200/50 dark:shadow-none border border-gray-200/50 dark:border-gray-800/50'
                     }`}
             >
                 <div className="px-5 md:px-6 h-16 flex items-center justify-between">
@@ -75,7 +75,7 @@ export const Navbar = () => {
                     </nav>
 
                     <div className="hidden md:flex items-center gap-3 lg:gap-5">
-                        <ThemeToggle />
+                        <ThemeToggle variant="landing" />
                         <Link href="/login" className="text-sm border border-transparent font-medium text-muted hover:text-foreground transition-colors px-2">
                             Log in
                         </Link>
@@ -88,7 +88,7 @@ export const Navbar = () => {
 
                     {/* Mobile Menu Toggle */}
                     <div className="flex items-center gap-3 md:hidden">
-                        <ThemeToggle />
+                        <ThemeToggle variant="landing" />
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             className="p-2 -mr-1 text-muted hover:text-foreground transition-colors relative z-50 rounded-full focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800"
