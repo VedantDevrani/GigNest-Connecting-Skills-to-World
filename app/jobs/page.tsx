@@ -50,6 +50,20 @@ export default async function JobsPage(props: {
                 },
                 _count: {
                     select: { proposals: true }
+                },
+                proposals: {
+                    select: {
+                        freelancer: {
+                            select: {
+                                avatarUrl: true,
+                                name: true
+                            }
+                        }
+                    },
+                    take: 3,
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
                 }
             },
             orderBy: {
@@ -177,16 +191,18 @@ export default async function JobsPage(props: {
                                                 <div className="flex justify-between items-center sm:block">
                                                     <span className="text-gray-400 dark:text-gray-500 text-xs sm:mb-1 block">Proposals</span>
                                                     <div className="flex items-center gap-2 mt-1">
-                                                        <div className="flex -space-x-2">
-                                                            {[...Array(Math.min(3, job._count.proposals || 1))].map((_, i) => (
-                                                                <Avatar key={i} src={`https://i.pravatar.cc/150?u=${i + parseInt(job.id.substring(job.id.length - 2), 16)}`} fallback="" size="sm" className="border-2 border-white dark:border-[#1A162B] pointer-events-none fade-in" />
-                                                            ))}
-                                                            {job._count.proposals > 3 && (
-                                                                <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#110e1d] border-2 border-white dark:border-[#1A162B] flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-400 z-10">
-                                                                    +{job._count.proposals - 3}
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                        {job._count.proposals > 0 && (
+                                                            <div className="flex -space-x-2">
+                                                                {job.proposals?.map((proposal: any, i: number) => (
+                                                                    <Avatar key={i} src={proposal.freelancer.avatarUrl} fallback={proposal.freelancer.name?.substring(0, 1).toUpperCase() || 'U'} size="sm" className="border-2 border-white dark:border-[#1A162B] pointer-events-none fade-in" />
+                                                                ))}
+                                                                {job._count.proposals > 3 && (
+                                                                    <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#110e1d] border-2 border-white dark:border-[#1A162B] flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-400 z-10">
+                                                                        +{job._count.proposals - 3}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                         <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{job._count.proposals}</span>
                                                     </div>
                                                 </div>
